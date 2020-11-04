@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+        <ion-button color="primary" (click)="closeModal()">
+            <ion-icon name="arrow-back" color="light"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-title>
+    	Add Member
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content padding class="login auth-page">
+    <!-- Add Members form -->
+    <form [formGroup]="onAddMemberForm" class="list-form" #form="ngForm">
+      <ion-item no-padding class="animated fadeInUp">
+        <ion-label position="floating">
+          <ion-icon name="man" item-start></ion-icon>
+          Member Name
+        </ion-label>
+        <ion-input [(ngModel)]="member.name" color="secondary" type="text" formControlName="fullName"></ion-input>
+      </ion-item>
+      <ion-item no-padding class="animated fadeInUp">
+        <ion-label position="floating">
+          <ion-icon name="mail" item-start></ion-icon>
+          Email Id
+        </ion-label>
+        <ion-input [(ngModel)]="member.email" color="secondary" type="text" formControlName="emailId"></ion-input>
+      </ion-item>
+      <p ion-text class="text08" *ngIf="onAddMemberForm.get('fullName').touched && onAddMemberForm.get('fullName').hasError('required')
+       && onAddMemberForm.get('emailId').touched && onAddMemberForm.get('emailId').hasError('required')">
+        <ion-text color="warning">
+          This field is required
+        </ion-text>
+      </p>
+    </form>
+
+	<ion-button margin shape="round" expand="full" color="secondary" (click)="addMember()" [disabled]="!onAddMemberForm.valid">Add Member</ion-button>
+</ion-content>

@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+        <ion-button color="primary" (click)="closeModal()">
+            <ion-icon name="arrow-back" color="light"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-title name="title">
+      {{groupName}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-card class="bg-white" no-margin>
+    <ion-card-content>
+      <h1 margin-bottom>
+        <ion-text color="primary"><strong>Members</strong></ion-text>
+      </h1>
+      
+      <ion-list>
+        <ion-item *ngFor="let item of memberNames" button (click)="goToMember(item)" detail>
+          {{item}}
+    
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-button margin shape="round" expand="full" color="secondary" (click)="addMember()">
+    Add Member
+  </ion-button>
+  <ion-card class="bg-white" no-margin>
+    <ion-card-content>
+      <h1 margin-bottom>
+        <ion-text color="primary"><strong>Chores</strong></ion-text>
+      </h1>
+      
+      <ion-list>
+        <ion-item *ngFor="let item of chores" button (click)="goToChore(item)" detail>
+          {{item.choreName}}
+          {{item.chorePoint}}
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-button margin shape="round" expand="full" color="secondary" (click)="addChore()">
+    Add Chore
+  </ion-button>
+
+</ion-content>

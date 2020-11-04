@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+        <ion-button color="primary" (click)="closeModal()">
+            <ion-icon name="arrow-back" color="light"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-title>
+    	Add Chore
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content padding class="login auth-page">
+    <!-- Add Chores form -->
+    <form [formGroup]="onAddChoreForm" class="list-form" #form="ngForm">
+      <ion-item no-padding class="animated fadeInUp">
+        <ion-label position="floating">
+          <ion-icon name="color-wand-outline" item-start></ion-icon>
+          Chore Name
+        </ion-label>
+        <ion-input [(ngModel)]="chore.choreName" color="secondary" type="text" formControlName="fullName"></ion-input>
+      </ion-item>
+      <ion-item no-padding class="animated fadeInUp">
+        <ion-label position="floating">
+          <ion-icon name="receipt-outline" item-start></ion-icon>
+          Chore Points
+        </ion-label>
+        <ion-input [(ngModel)]="chore.chorePoint" color="secondary" type="text" formControlName="chorePoint"></ion-input>
+      </ion-item>
+      <p ion-text class="text08" *ngIf="onAddChoreForm.get('fullName').touched && onAddChoreForm.get('fullName').hasError('required')
+       && onAddChoreForm.get('chorePoint').touched && onAddChoreForm.get('chorePoint').hasError('required')">
+        <ion-text color="warning">
+          This field is required
+        </ion-text>
+      </p>
+    </form>
+
+	<ion-button margin shape="round" expand="full" color="secondary" (click)="addChore()" [disabled]="!onAddChoreForm.valid">Add Chore</ion-button>
+</ion-content>

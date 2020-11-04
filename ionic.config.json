@@ -1,0 +1,9 @@
+{
+  "name": "ionic4Start",
+  "integrations": {
+    "cordova": {},
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "3fff720e"
+}

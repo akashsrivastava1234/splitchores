@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+        <ion-button color="primary" (click)="closeModal()">
+            <ion-icon name="arrow-back" color="light"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-title>
+    	Add Group
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content padding class="login auth-page">
+    <!-- Add Groups form -->
+    <form [formGroup]="onAddGroupForm" class="list-form" #form="ngForm">
+      <ion-item no-padding class="animated fadeInUp">
+        <ion-label position="floating">
+          <ion-icon name="people" item-start></ion-icon>
+          Group Name
+        </ion-label>
+        <ion-input [(ngModel)]="group.name" color="secondary" type="text" formControlName="fullName"></ion-input>
+      </ion-item>
+      <p ion-text class="text08" *ngIf="onAddGroupForm.get('fullName').touched && onAddGroupForm.get('fullName').hasError('required')">
+        <ion-text color="warning">
+          This field is required
+        </ion-text>
+      </p>
+    </form>
+
+	<ion-button margin shape="round" expand="full" color="secondary" (click)="addGroup()" [disabled]="!onAddGroupForm.valid">Add Group</ion-button>
+</ion-content>

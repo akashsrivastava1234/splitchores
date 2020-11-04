@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button color="secondary"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+        <ion-text color="light">
+          <ion-text color="light" class="fw700">Split Chores</ion-text>
+        </ion-text>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button size="small" shape="round" color="medium" (click)="notifications('')">
+        <ion-icon name="notifications"></ion-icon>
+        <ion-badge color="dark" slot="end">0</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card no-margin class="no-radius">
+    <ion-item lines="none" color="medium">
+      <ion-label>
+        <h2 no-margin class="fw500 no-margin">
+          <ion-text color="dark">Family Groups</ion-text>
+        </h2>
+      </ion-label>
+    </ion-item>
+  </ion-card>
+
+
+  <ion-list>
+    <ion-item *ngFor="let item of groupsName" button (click)="goToGroup(item)" detail>
+      {{item}}
+
+    </ion-item>
+  </ion-list>
+
+  <ion-button margin shape="round" expand="full" color="secondary" (click)="addGroup()">
+    Add Group
+  </ion-button>
+  
+
+  <!--<popmenu></popmenu>-->
+</ion-content>
+  
