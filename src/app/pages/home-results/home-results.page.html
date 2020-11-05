@@ -31,8 +31,7 @@
 
   <ion-list>
     <ion-item *ngFor="let item of groupsName" button (click)="goToGroup(item)" detail>
-      {{item}}
-
+      {{item.familyName}}  ->   {{item.memberPoints}}
     </ion-item>
   </ion-list>
 
@@ -40,6 +39,14 @@
     Add Group
   </ion-button>
   
+  <ion-text color="primary">
+    <h1> My Chores</h1>
+  </ion-text>
+  <ion-list>
+    <ion-item *ngFor="let item of choresName" button (click)="goToChore(item)" detail>
+      {{item.choreName}}  ->   {{item.chorePoint}}
+    </ion-item>
+  </ion-list>
 
   <!--<popmenu></popmenu>-->
 </ion-content>

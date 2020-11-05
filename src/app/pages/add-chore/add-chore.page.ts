@@ -6,6 +6,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { Platform, NavController, ToastController, MenuController, AlertController, LoadingController } from '@ionic/angular';
 import { Chores } from 'src/app/Chores';
 import { Chore } from 'src/app/Chores';
+import { EditGroupData } from 'src/app/editGroupData';
 
 @Component({
   selector: 'app-add-chore',
@@ -35,10 +36,10 @@ export class AddChorePage implements OnInit {
     });
   }
 
-  chore = new Chore("", "");  
+  chore = new Chore("", "", "", "", "", "", EditGroupData.GroupName.familyId, "1");  
   addChoreURL : string = "http://192.168.29.206:8081/groups/add";
   async addChore() {
-/*    const loader = await this.loadingCtrl.create({
+    const loader = await this.loadingCtrl.create({
       duration: 2000
     });
     loader.present();
@@ -50,16 +51,15 @@ export class AddChorePage implements OnInit {
     headers.append('responseType','text');
 
     this.http.post(this.addChoreURL,
-    {
-        "fullName" : this.group.name,
-    }, {headers})
+      JSON.parse(JSON.stringify(this.chore))
+    , {headers})
     .subscribe(
         (val) => {
             //console.log("POST call successful value returned in body", 
             //            val);
-                        
+            Chores.chores.push(this.chore);
             loader.dismiss();
-            this.toastBox("Group Added Successfully");
+            this.toastBox("Member Added Successfully");
             this.closeModal();
 
         },
@@ -72,8 +72,8 @@ export class AddChorePage implements OnInit {
         },
         () => {
             //console.log("The POST observable is now completed.");
-            this.emptyFields(this.group);
-        });*/
+            this.emptyFields(this.chore);
+        });
 
         Chores.chores.push(this.chore)
         this.nav.navigateForward('/edit-group'); 

@@ -7,8 +7,8 @@ import { Platform, NavController, ToastController, MenuController, AlertControll
 import { ActivatedRoute } from "@angular/router";
 
 import { Globals } from 'src/app/Globals';
-import { EditGroupData } from 'src/app/editGroupData';
-import { Chores } from 'src/app/Chores';
+import { EditGroupData, Member } from 'src/app/editGroupData';
+import { Chores, Chore } from 'src/app/Chores';
 
 @Component({
   selector: 'app-edit-group',
@@ -33,54 +33,59 @@ export class EditGroupPage implements OnInit {
   memberNames = null;
   chores = null;
   ngOnInit() {
+    this.getMemberByFamily();
+    this.getTasksByFamily();
     this.groupName = EditGroupData.GroupName;
     this.memberNames = EditGroupData.memberNames;
+    
     this.chores = Chores.chores
     console.log(this.memberNames);
   }
 
 
-  editGroupURL : string = "http://192.168.29.206:8081/groups/edit";
-  async editGroup() {
-/*    const loader = await this.loadingCtrl.create({
-      duration: 2000
-    });
-    loader.present();
-    //const headers = new HttpHeaders()
-    //.set("Content-Type", "application/json");
-    var headers = new HttpHeaders();
-    headers.append('Access-Control-Allow-Origin' , '*');
-    headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT');
-    headers.append('responseType','text');
+  memberByFamilyURL : string = "http://192.168.29.206:8081/MemberFamilies/";
+  tasksByFamilyURL : string = "http://192.168.29.206:8081/FamilyTasks/" + EditGroupData.GroupName.familyId + "/";
+  getMemberByFamily() {
+    console.log("getMemberByFamily");
+    this.http.get(this.memberByFamilyURL + EditGroupData.GroupName.familyId, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("GET call successful value returned in body", 
+                          val);
+                          EditGroupData.memberNames = [];
+                for (var v in val) {
+                  EditGroupData.memberNames.push(new Member(v["memberId"], v["memberName"], v["points"]));
+                }    
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
 
-    this.http.post(this.editGroupURL,
-    {
-        "fullName" : this.group.name,
-    }, {headers})
-    .subscribe(
-        (val) => {
-            //console.log("POST call successful value returned in body", 
-            //            val);
-                        
-            loader.dismiss();
-            this.toastBox("Group Edited Successfully");
-            this.closeModal();
+  }
 
-        },
-        response => {
-            //console.log("POST call in error", response);
-            // user already exists
-            loader.duration = 1;
-            loader.dismiss();
-            this.toastBox("Group Already Exists");
-        },
-        () => {
-            //console.log("The POST observable is now completed.");
-            this.emptyFields(this.group);
-        });*/
-
-        Globals.groupsName.push(this.group.name)
-        this.nav.navigateForward('/home-results'); 
+  getTasksByFamily() {
+    console.log("getTasksByFamily");
+    this.http.get(this.tasksByFamilyURL, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("GET call successful value returned in body", 
+                          val);
+                          Chores.chores = [];
+                for (var v in val) {
+                  Chores.chores.push(<Chore>JSON.parse(v));
+                }    
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
   }
 
 

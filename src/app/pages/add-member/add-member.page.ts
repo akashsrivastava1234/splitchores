@@ -4,7 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {HttpClientModule} from '@angular/common/http';
 import { Platform, NavController, ToastController, MenuController, AlertController, LoadingController } from '@ionic/angular';
-import { EditGroupData } from 'src/app/editGroupData';
+import { EditGroupData, Member } from 'src/app/editGroupData';
 
 @Component({
   selector: 'app-add-member',
@@ -34,10 +34,10 @@ export class AddMemberPage implements OnInit {
     });
   }
 
-  member = new Member("", "");  
-  addMemberURL : string = "http://192.168.29.206:8081/groups/add";
+  member = new Member("", "", "");  
+  addMemberURL : string = "http://192.168.29.206:8081/members/add";
   async addMember() {
-/*    const loader = await this.loadingCtrl.create({
+    const loader = await this.loadingCtrl.create({
       duration: 2000
     });
     loader.present();
@@ -50,15 +50,16 @@ export class AddMemberPage implements OnInit {
 
     this.http.post(this.addMemberURL,
     {
-        "fullName" : this.group.name,
+        "familyId" : EditGroupData.GroupName.familyId,
+        "memberId" : this.member.memberId
     }, {headers})
     .subscribe(
         (val) => {
             //console.log("POST call successful value returned in body", 
             //            val);
-                        
+            EditGroupData.memberNames.push(this.member);
             loader.dismiss();
-            this.toastBox("Group Added Successfully");
+            this.toastBox("Member Added Successfully");
             this.closeModal();
 
         },
@@ -71,10 +72,9 @@ export class AddMemberPage implements OnInit {
         },
         () => {
             //console.log("The POST observable is now completed.");
-            this.emptyFields(this.group);
-        });*/
-
-        EditGroupData.memberNames.push(this.member.name)
+            this.emptyFields(this.member);
+        });
+        //EditGroupData.memberNames.push(this.member.name)
         this.nav.navigateForward('/edit-group'); 
   }
 
@@ -84,8 +84,8 @@ export class AddMemberPage implements OnInit {
   }
 
   emptyFields( memberDetails: Member) {
-    memberDetails.name = ""
-    memberDetails.email = ""
+    memberDetails.memberId = ""
+    memberDetails.memberName = ""
   }
 
   async toastBox(errorMessage: string) {
@@ -98,12 +98,4 @@ export class AddMemberPage implements OnInit {
 
     toast.present();
   }
-}
-
-export class Member {
-
-  constructor(
-    public name: string, public email: string
-  ) {  }
-
 }

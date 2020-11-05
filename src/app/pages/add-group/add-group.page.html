@@ -18,7 +18,7 @@
           <ion-icon name="people" item-start></ion-icon>
           Group Name
         </ion-label>
-        <ion-input [(ngModel)]="group.name" color="secondary" type="text" formControlName="fullName"></ion-input>
+        <ion-input [(ngModel)]="group.familyName" color="secondary" type="text" formControlName="fullName"></ion-input>
       </ion-item>
       <p ion-text class="text08" *ngIf="onAddGroupForm.get('fullName').touched && onAddGroupForm.get('fullName').hasError('required')">
         <ion-text color="warning">

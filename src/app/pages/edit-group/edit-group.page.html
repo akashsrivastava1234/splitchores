@@ -6,7 +6,7 @@
         </ion-button>
     </ion-buttons>
     <ion-title name="title">
-      {{groupName}}
+      {{groupName.familyName}}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -19,7 +19,7 @@
       
       <ion-list>
         <ion-item *ngFor="let item of memberNames" button (click)="goToMember(item)" detail>
-          {{item}}
+          {{item.memberName}}
     
         </ion-item>
       </ion-list>

@@ -9,7 +9,8 @@ import {
   import { NavigationExtras } from '@angular/router';
 // Call notifications test by Popover and Custom Component.
 import { NotificationsComponent } from './../../components/notifications/notifications.component';
-import { Globals } from 'src/app/Globals';
+import { Globals, MemberFamily } from 'src/app/Globals';
+import { Chores, Chore} from 'src/app/Chores';
 import { EditGroupData } from 'src/app/editGroupData';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LatLng } from '@ionic-native/google-maps';
@@ -46,35 +47,32 @@ export class HomeResultsPage {
   }
 
   groupsName = null;
+  choresName = null;
   ionViewWillEnter() {
     this.backgroundMode.enable();
     this.menuCtrl.enable(true);
+    this.getFamiliesByMemberId();
+    this.getTasksByMemberId();
+    this.groupsName = Globals.groupsName;
+    this.choresName = Chores.chores;
     //this.getNotifications();
   }
 
-  notifyUrl : string = "http://192.168.29.206:8081/notify";
-  async getNotifications() {
-    this.localNotifications.on('click').subscribe(notification => {
-        //this.navCtrl.navigateRoot("/donate");
-    });
-      while(true) {
-        //console.log("log");
-        await this.delay(5000);
+  getFamiliesURL : string = "http://192.168.29.206:8081/MemberFamilies/" + Globals.userId;
+  getTasks : string = "http://192.168.29.206:8081/tasks/" + Globals.userId;
 
-        
-        this.http.post(this.notifyUrl, {
-          "id" : Globals.userId
+  getFamiliesByMemberId() {
+        console.log("getFamiliesByMemberId");
+        this.http.get(this.getFamiliesURL, {
       })
           .subscribe(
               (val) => {
                   console.log("GET call successful value returned in body", 
                               val);
-                    // Add the notification logic
-                    this.localNotifications.schedule({
-                      id: 1,
-                      text: 'New location has been added in your area',
-                      data: { secret: 'val' }
-                    });
+                              Globals.groupsName = [];
+                    for (var v in val) {
+                      Globals.groupsName.push(new MemberFamily(v["familyId"], v["familyName"], v["memberPoints"]));
+                    }
                     
               },
               response => {
@@ -83,11 +81,29 @@ export class HomeResultsPage {
               () => {
 //                  console.log("The POST observable is now completed.");
               });
-    
-
-
-      }
   }
+
+  getTasksByMemberId() {
+    console.log("getTasksByMemberId");
+    this.http.get(this.getTasks, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("GET call successful value returned in body", 
+                          val);
+                          Globals.groupsName = [];
+                for (var v in val) {
+                  Chores.chores.push(<Chore>JSON.parse(v));
+                }
+                
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
+}
 
   async delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
@@ -129,7 +145,7 @@ export class HomeResultsPage {
           currency: name
       }
     };*/
-
+    console.log(name);
     EditGroupData.GroupName = name;
 
     this.navCtrl.navigateForward('/edit-group');

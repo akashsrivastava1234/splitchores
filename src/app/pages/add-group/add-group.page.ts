@@ -4,7 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {HttpClientModule} from '@angular/common/http';
 import { Platform, NavController, ToastController, MenuController, AlertController, LoadingController } from '@ionic/angular';
-import { Globals } from 'src/app/Globals';
+import { Globals, MemberFamily } from 'src/app/Globals';
 
 @Component({
   selector: 'app-add-group',
@@ -14,7 +14,7 @@ import { Globals } from 'src/app/Globals';
 export class AddGroupPage implements OnInit {
 
   public onAddGroupForm: FormGroup;
-  group = new Group("");
+  group = new MemberFamily("", "", "0");
   constructor(public plt: Platform,
     public nav: NavController,
     private modalCtrl: ModalController,
@@ -23,7 +23,11 @@ export class AddGroupPage implements OnInit {
     public toastCtrl: ToastController,
     private formBuilder: FormBuilder,
     private http:HttpClient) { }
-
+/*{
+    "familyId":
+    "familyName": 
+    members:[id]
+}*/
   ngOnInit() {
     this.onAddGroupForm = this.formBuilder.group({
       'fullName': [null, Validators.compose([
@@ -35,7 +39,7 @@ export class AddGroupPage implements OnInit {
 
   addGroupURL : string = "http://192.168.29.206:8081/groups/add";
   async addGroup() {
-/*    const loader = await this.loadingCtrl.create({
+    const loader = await this.loadingCtrl.create({
       duration: 2000
     });
     loader.present();
@@ -48,13 +52,15 @@ export class AddGroupPage implements OnInit {
 
     this.http.post(this.addGroupURL,
     {
-        "fullName" : this.group.name,
+        "familyId" : this.group.familyId,
+        "familyName" : this.group.familyName,
+        "members" : [Globals.userId]
     }, {headers})
     .subscribe(
         (val) => {
             //console.log("POST call successful value returned in body", 
             //            val);
-                        
+            Globals.groupsName.push(this.group);
             loader.dismiss();
             this.toastBox("Group Added Successfully");
             this.closeModal();
@@ -70,9 +76,9 @@ export class AddGroupPage implements OnInit {
         () => {
             //console.log("The POST observable is now completed.");
             this.emptyFields(this.group);
-        });*/
+        });
 
-        Globals.groupsName.push(this.group.name)
+        //Globals.groupsName.push(this.group.name)
         this.nav.navigateForward('/home-results'); 
   }
 
@@ -81,8 +87,10 @@ export class AddGroupPage implements OnInit {
     this.nav.navigateForward('/home-results'); 
   }
 
-  emptyFields( groupDetails: Group) {
-    groupDetails.name = " "
+  emptyFields( groupDetails: MemberFamily) {
+    groupDetails.familyName = " "
+    groupDetails.familyId = " "
+    groupDetails.memberPoints = " "
   }
 
   async toastBox(errorMessage: string) {
@@ -96,13 +104,5 @@ export class AddGroupPage implements OnInit {
     toast.present();
   }
 
-
-}
-
-export class Group {
-
-  constructor(
-    public name: string
-  ) {  }
 
 }

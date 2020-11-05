@@ -1,5 +1,18 @@
 import { Injectable } from '@angular/core';
 
+
+export class MemberFamily {
+  familyId;
+  familyName;
+  memberPoints;
+  constructor(familyId, familyName, memberPoints) {
+    this.familyId = familyId;
+    this.familyName = familyName;
+    this.memberPoints = memberPoints;
+  }
+}
+
+
 Injectable()
 export class Globals{
     static UserName = 'UserName';
@@ -17,7 +30,7 @@ export class Globals{
     }
     
     static groupsName = [
-      "Group 1",
-      "Group 2"
+      new MemberFamily("G1", "Group 1", 100),
+      new MemberFamily("G2", "Group 2", 200)
     ];
 }
