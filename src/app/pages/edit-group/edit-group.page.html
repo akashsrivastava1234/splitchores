@@ -36,8 +36,8 @@
       
       <ion-list>
         <ion-item *ngFor="let item of chores" button (click)="goToChore(item)" detail>
-          {{item.choreName}}
-          {{item.chorePoint}}
+          {{item.name}}
+          {{item.points}}
         </ion-item>
       </ion-list>
     </ion-card-content>

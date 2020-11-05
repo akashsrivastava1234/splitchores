@@ -36,8 +36,8 @@ export class AddChorePage implements OnInit {
     });
   }
 
-  chore = new Chore("", "", "", "", "", "", EditGroupData.GroupName.familyId, "1");  
-  addChoreURL : string = "http://192.168.29.206:8081/groups/add";
+  chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
+  addChoreURL : string = "http://splitchores.azurewebsites.net/createTask";
   async addChore() {
     const loader = await this.loadingCtrl.create({
       duration: 2000
@@ -49,14 +49,16 @@ export class AddChorePage implements OnInit {
     headers.append('Access-Control-Allow-Origin' , '*');
     headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT');
     headers.append('responseType','text');
+    console.log("POST BODY : " + JSON.parse(JSON.stringify(this.chore)))
 
-    this.http.post(this.addChoreURL,
+    this.http.post<Chore>(this.addChoreURL,
       JSON.parse(JSON.stringify(this.chore))
     , {headers})
     .subscribe(
         (val) => {
-            //console.log("POST call successful value returned in body", 
-            //            val);
+            console.log("Add Chore POST call successful value returned in body", 
+                        val);
+            this.chore.fromJSON(val);
             Chores.chores.push(this.chore);
             loader.dismiss();
             this.toastBox("Member Added Successfully");
@@ -64,7 +66,7 @@ export class AddChorePage implements OnInit {
 
         },
         response => {
-            //console.log("POST call in error", response);
+            console.log("POST call in error", response);
             // user already exists
             loader.duration = 1;
             loader.dismiss();
@@ -75,7 +77,8 @@ export class AddChorePage implements OnInit {
             this.emptyFields(this.chore);
         });
 
-        Chores.chores.push(this.chore)
+          
+        
         this.nav.navigateForward('/edit-group'); 
   }
 
@@ -85,8 +88,8 @@ export class AddChorePage implements OnInit {
   }
 
   emptyFields( choreDetails: Chore) {
-    choreDetails.choreName = ""
-    choreDetails.chorePoint = ""
+    choreDetails.name = ""
+    choreDetails.points = ""
   }
 
   async toastBox(errorMessage: string) {

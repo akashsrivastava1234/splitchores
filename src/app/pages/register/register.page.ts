@@ -13,7 +13,7 @@ export class RegisterPage implements OnInit {
 
   user = new User("", "", "");
   public onRegisterForm: FormGroup;
-  signupURL = "http://192.168.29.206:8081/user/create"
+  signupURL = "https://splitchores.azurewebsites.net/createMember"
   constructor(
     public navCtrl: NavController,
     public menuCtrl: MenuController,
@@ -48,22 +48,23 @@ export class RegisterPage implements OnInit {
     });
     loader.present();
     //const headers = new HttpHeaders()
-    //.set("Content-Type", "application/json");
+    
     var headers = new HttpHeaders();
+    headers.set("Content-Type", "application/json");
     headers.append('Access-Control-Allow-Origin' , '*');
     headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT');
     headers.append('responseType','text');
 
     this.http.post(this.signupURL,
     {
-        "fullName" : this.user.name,
+        "memberName" : this.user.name,
         "password" : this.user.password,
         "id" : this.user.email
     }, {headers})
     .subscribe(
         (val) => {
-            //console.log("POST call successful value returned in body", 
-            //            val);
+            console.log("POST call successful value returned in body", 
+                        val);
                         
             loader.dismiss();
             this.toastBox("User Registered Successfully");

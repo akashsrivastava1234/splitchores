@@ -1,34 +1,66 @@
 import { Injectable, Inject } from '@angular/core';
 Injectable()
 export class Chore {
-  choreName;
-  chorePoint;
-  choreType;
+  id;
+  name;
+  points;
   ownerId;
   startDate;
   expiryDate;
   familyId;
   total;
+  type;
+  status;
+  completedAt;
+  choresRotationSchedule;
   constructor(
-    choreName: any, chorePoint: any,   choreType, ownerId, startDate, expiryDate, familyId, total
+  name,
+  points,
+  ownerId,
+  startDate,
+  expiryDate,
+  familyId,
+  total,
+  type,
+  status,
+  completedAt,
+  choresRotationSchedule,
+  id = null
   ) {
-    this.choreName = choreName;
-    this.chorePoint = chorePoint;
-    this.choreType = choreType;
-    this.ownerId = ownerId;
+    this.id = id;
+    this.familyId = familyId;
+    this.name = name;
+    this.type = type;
     this.startDate = startDate;
     this.expiryDate = expiryDate;
-    this.familyId = familyId;
+
+    this.points = points;    
     this.total = total;
+    this.ownerId = ownerId;
+    this.status = status;
+    this.completedAt = completedAt;
+    this.choresRotationSchedule = choresRotationSchedule;
+    
   }
+
+  
+  fromJSON(json) {
+    for (var propName in json)
+        this[propName] = json[propName];
+    return this;
+}
+
+clone() {
+  return this.clone();
+}
 }
 
 Injectable()
 export class Chores{
 
     static chores = [
-        new Chore("Cooking", 500, "member1", "", "", "", "family1", "1"),
-        new Chore("Cleaning Utensils", 400, "member1", "", "", "", "family1", "1"),
+        //new Chore("Cooking", 500, "member1", "", "", "", "family1", "1"),
+        //new Chore("Cleaning Utensils", 400, "member1", "", "", "", "family1", "1"),
       ];
 
     static ChoreName = '';

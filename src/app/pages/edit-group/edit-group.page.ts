@@ -43,15 +43,15 @@ export class EditGroupPage implements OnInit {
   }
 
 
-  memberByFamilyURL : string = "http://192.168.29.206:8081/MemberFamilies/";
-  tasksByFamilyURL : string = "http://192.168.29.206:8081/FamilyTasks/" + EditGroupData.GroupName.familyId + "/";
+  memberByFamilyURL : string = "http://splitchores.azurewebsites.net/MemberFamilies/";
+  tasksByFamilyURL : string = "http://splitchores.azurewebsites.net/FamilyTasks/" + EditGroupData.GroupName.familyId + "/";
   getMemberByFamily() {
     console.log("getMemberByFamily");
     this.http.get(this.memberByFamilyURL + EditGroupData.GroupName.familyId, {
   })
       .subscribe(
           (val) => {
-              console.log("GET call successful value returned in body", 
+              console.log("Get Member By Family GET call successful value returned in body", 
                           val);
                           EditGroupData.memberNames = [];
                 for (var v in val) {
@@ -73,7 +73,7 @@ export class EditGroupPage implements OnInit {
   })
       .subscribe(
           (val) => {
-              console.log("GET call successful value returned in body", 
+              console.log("Get Tasks By family GET call successful value returned in body", 
                           val);
                           Chores.chores = [];
                 for (var v in val) {

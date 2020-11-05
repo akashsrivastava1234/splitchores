@@ -18,14 +18,14 @@
           <ion-icon name="color-wand-outline" item-start></ion-icon>
           Chore Name
         </ion-label>
-        <ion-input [(ngModel)]="chore.choreName" color="secondary" type="text" formControlName="fullName"></ion-input>
+        <ion-input [(ngModel)]="chore.name" color="secondary" type="text" formControlName="fullName"></ion-input>
       </ion-item>
       <ion-item no-padding class="animated fadeInUp">
         <ion-label position="floating">
           <ion-icon name="receipt-outline" item-start></ion-icon>
           Chore Points
         </ion-label>
-        <ion-input [(ngModel)]="chore.chorePoint" color="secondary" type="text" formControlName="chorePoint"></ion-input>
+        <ion-input [(ngModel)]="chore.points" color="secondary" type="text" formControlName="chorePoint"></ion-input>
       </ion-item>
       <p ion-text class="text08" *ngIf="onAddChoreForm.get('fullName').touched && onAddChoreForm.get('fullName').hasError('required')
        && onAddChoreForm.get('chorePoint').touched && onAddChoreForm.get('chorePoint').hasError('required')">

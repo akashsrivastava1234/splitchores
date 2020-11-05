@@ -8,6 +8,16 @@ export class Member {
     this.memberName = memberName;
     this.points = points;
   }
+
+  fromJSON(json) {
+    for (var propName in json)
+        this[propName] = json[propName];
+    return this;
+}
+
+clone(){
+  return new Member(this.memberId, this.memberName, this.points)
+}
 }
 
 Injectable()

@@ -37,7 +37,7 @@ export class AddGroupPage implements OnInit {
   }
 
 
-  addGroupURL : string = "http://192.168.29.206:8081/groups/add";
+  addGroupURL : string = "http://splitchores.azurewebsites.net/Family";
   async addGroup() {
     const loader = await this.loadingCtrl.create({
       duration: 2000
@@ -52,14 +52,13 @@ export class AddGroupPage implements OnInit {
 
     this.http.post(this.addGroupURL,
     {
-        "familyId" : this.group.familyId,
         "familyName" : this.group.familyName,
-        "members" : [Globals.userId]
+        "members" : [{"memberId" : Globals.userId}]
     }, {headers})
     .subscribe(
         (val) => {
-            //console.log("POST call successful value returned in body", 
-            //            val);
+            console.log("Add Family POST call successful value returned in body", 
+                        val);
             Globals.groupsName.push(this.group);
             loader.dismiss();
             this.toastBox("Group Added Successfully");

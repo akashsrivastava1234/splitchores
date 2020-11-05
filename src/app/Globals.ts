@@ -33,4 +33,10 @@ export class Globals{
       new MemberFamily("G1", "Group 1", 100),
       new MemberFamily("G2", "Group 2", 200)
     ];
+    
+    static async delay(ms: number) {
+      return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
+  
 }

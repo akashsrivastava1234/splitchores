@@ -11,7 +11,7 @@ import {
 import { NotificationsComponent } from './../../components/notifications/notifications.component';
 import { Globals, MemberFamily } from 'src/app/Globals';
 import { Chores, Chore} from 'src/app/Chores';
-import { EditGroupData } from 'src/app/editGroupData';
+import { EditGroupData, Member } from 'src/app/editGroupData';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LatLng } from '@ionic-native/google-maps';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
@@ -43,59 +43,39 @@ export class HomeResultsPage {
     private http:HttpClient,
     private localNotifications: LocalNotifications
   ) {
-    this.groupsName = Globals.groupsName;
+    //this.getFamiliesByMemberId();
+    //this.getTasksByMemberId();
+    console.log(this.groupsName);
   }
 
-  groupsName = null;
-  choresName = null;
+  groupsName = Globals.groupsName;
+  choresName = Chores.chores;
   ionViewWillEnter() {
     this.backgroundMode.enable();
     this.menuCtrl.enable(true);
-    this.getFamiliesByMemberId();
-    this.getTasksByMemberId();
-    this.groupsName = Globals.groupsName;
-    this.choresName = Chores.chores;
-    //this.getNotifications();
   }
 
-  getFamiliesURL : string = "http://192.168.29.206:8081/MemberFamilies/" + Globals.userId;
-  getTasks : string = "http://192.168.29.206:8081/tasks/" + Globals.userId;
+  getFamiliesURL : string = "http://splitchores.azurewebsites.net/MemberFamilies/" + Globals.userId;
+  getTasks : string = "http://splitchores.azurewebsites.net/tasks/" + Globals.userId;
 
-  getFamiliesByMemberId() {
-        console.log("getFamiliesByMemberId");
-        this.http.get(this.getFamiliesURL, {
-      })
-          .subscribe(
-              (val) => {
-                  console.log("GET call successful value returned in body", 
-                              val);
-                              Globals.groupsName = [];
-                    for (var v in val) {
-                      Globals.groupsName.push(new MemberFamily(v["familyId"], v["familyName"], v["memberPoints"]));
-                    }
-                    
-              },
-              response => {
-                  console.log("No New Notification");
-              },
-              () => {
-//                  console.log("The POST observable is now completed.");
-              });
-  }
 
-  getTasksByMemberId() {
-    console.log("getTasksByMemberId");
-    this.http.get(this.getTasks, {
+
+  member = new Member("","","")
+  getMemberByFamily() {
+    var memberByFamilyURL = "http://splitchores.azurewebsites.net/FamilyMembers/";
+    console.log("getMemberByFamily" + memberByFamilyURL + EditGroupData.GroupName.familyId);
+    this.http.get(memberByFamilyURL + EditGroupData.GroupName.familyId, {
   })
       .subscribe(
           (val) => {
-              console.log("GET call successful value returned in body", 
+              console.log("Get Member by Family GET call successful value returned in body", 
                           val);
-                          Globals.groupsName = [];
+                          EditGroupData.memberNames = [];
                 for (var v in val) {
-                  Chores.chores.push(<Chore>JSON.parse(v));
-                }
-                
+
+                  this.member.fromJSON(val[v]);
+                  EditGroupData.memberNames.push(this.member.clone());
+                }    
           },
           response => {
               console.log("No New Notification");
@@ -103,7 +83,32 @@ export class HomeResultsPage {
           () => {
 //                  console.log("The POST observable is now completed.");
           });
-}
+
+  }
+
+  chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
+  getTasksByFamily() {
+    var tasksByFamilyURL = "http://splitchores.azurewebsites.net/FamilyTask/" + EditGroupData.GroupName.familyId;
+    console.log("getTasksByFamily"+ EditGroupData.GroupName.familyId);
+    this.http.get(tasksByFamilyURL, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("Get Tasks by familyGET call successful value returned in body", 
+                          val);
+                          Chores.chores = [];
+                for (var v in val) {
+                  this.chore.fromJSON(val[v]);
+                  Chores.chores.push(this.chore);
+                }    
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
+  }
 
   async delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
@@ -147,6 +152,9 @@ export class HomeResultsPage {
     };*/
     console.log(name);
     EditGroupData.GroupName = name;
+    this.getMemberByFamily();
+    this.getTasksByFamily();
+    await Globals.delay(2500);
 
     this.navCtrl.navigateForward('/edit-group');
   }

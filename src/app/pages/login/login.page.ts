@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavController, MenuController, ToastController, AlertController, LoadingController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Globals } from '../../Globals';
+import { Globals, MemberFamily } from 'src/app/Globals';
+import { Chores, Chore} from 'src/app/Chores';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -15,7 +17,7 @@ export class LoginPage implements OnInit {
 
   user = new User("", "");
   public onRegisterForm: FormGroup;
-  signinURL = "http://192.168.29.206:8081/user/login"
+  signinURL = "http://splitchores.azurewebsites.net/login"
   constructor(
     private globals: Globals,
     public navCtrl: NavController,
@@ -105,15 +107,20 @@ export class LoginPage implements OnInit {
           "id" : this.user.email
       })
       .subscribe(
-          (val) => {
-              //console.log("POST call successful value returned in body", 
-              //            val);
+          async (val) => {
+              console.log("POST call successful value returned in body", 
+                          val);
                           
-              loader.dismiss();
               
-              Globals.UserName = val["fullName"];
+              
+              Globals.UserName = val["memberName"];
               Globals.userId= val["id"];
 
+              this.getFamiliesByMemberId();
+              this.getTasksByMemberId();
+    
+              await Globals.delay(3000)
+              loader.dismiss();
               this.toastBox("SignIn Successful");
               this.navCtrl.navigateRoot('/home-results');  
   
@@ -149,13 +156,68 @@ export class LoginPage implements OnInit {
   
   emptyFields( userDetails: User) {
     userDetails.email = " "
-    userDetails.password = "********"
+    userDetails.password = " "
   }
 
 
   async testFb() {
     this.navCtrl.navigateRoot('/home-results');  
   }
+
+
+  
+  
+  
+//Tested
+  async getFamiliesByMemberId() {
+    var getFamiliesURL  = "http://splitchores.azurewebsites.net/MemberFamilies/" + Globals.userId;
+        console.log("getFamiliesByMemberId " + getFamiliesURL);
+        this.http.get(getFamiliesURL, {
+      })
+          .subscribe(
+              (val) => {
+                  console.log("Get families by member GET call successful value returned in body", 
+                              val);
+                              Globals.groupsName = [];
+                    for (var v in val) {
+                      Globals.groupsName.push(new MemberFamily(val[v].familyId, val[v].familyName, val[v].memberPoints));
+                    }
+                    
+              },
+              response => {
+                  console.log("No New Notification");
+              },
+              () => {
+//                  console.log("The POST observable is now completed.");
+              });
+  }
+
+
+  chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
+  async getTasksByMemberId() {
+    var getTasks = "http://splitchores.azurewebsites.net/tasks/" + Globals.userId;
+    console.log("getTasksByMemberId");
+    this.http.get(getTasks, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("Get Tasks b member GET call successful value returned in body", 
+                          val);
+                          Chores.chores = [];
+                for (var v in val) {
+                  this.chore.fromJSON(val[v]);
+                  Chores.chores.push(this.chore);
+                }
+                
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
+}
+
 
 }
 

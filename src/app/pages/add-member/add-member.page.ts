@@ -35,7 +35,7 @@ export class AddMemberPage implements OnInit {
   }
 
   member = new Member("", "", "");  
-  addMemberURL : string = "http://192.168.29.206:8081/members/add";
+  addMemberURL : string = "http://splitchores.azurewebsites.net/Family";
   async addMember() {
     const loader = await this.loadingCtrl.create({
       duration: 2000
@@ -45,18 +45,18 @@ export class AddMemberPage implements OnInit {
     //.set("Content-Type", "application/json");
     var headers = new HttpHeaders();
     headers.append('Access-Control-Allow-Origin' , '*');
-    headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT');
+    headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, PATCH');
     headers.append('responseType','text');
 
-    this.http.post(this.addMemberURL,
+    this.http.patch(this.addMemberURL,
     {
         "familyId" : EditGroupData.GroupName.familyId,
-        "memberId" : this.member.memberId
+        "members" : [{"memberId" : this.member.memberId, "memberPoints" : "0"}]
     }, {headers})
     .subscribe(
         (val) => {
-            //console.log("POST call successful value returned in body", 
-            //            val);
+            console.log("Add Member POST call successful value returned in body", 
+                        val);
             EditGroupData.memberNames.push(this.member);
             loader.dismiss();
             this.toastBox("Member Added Successfully");
