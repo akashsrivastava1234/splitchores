@@ -27,12 +27,43 @@
         </ion-label>
         <ion-input [(ngModel)]="chore.points" color="secondary" type="text" formControlName="chorePoint"></ion-input>
       </ion-item>
-      <p ion-text class="text08" *ngIf="onAddChoreForm.get('fullName').touched && onAddChoreForm.get('fullName').hasError('required')
-       && onAddChoreForm.get('chorePoint').touched && onAddChoreForm.get('chorePoint').hasError('required')">
-        <ion-text color="warning">
-          This field is required
-        </ion-text>
-      </p>
+      <p></p>
+      <ion-card class="bg-white" no-margin>
+        <ion-card-content>
+          <ion-item no-padding class="animated fadeInUp">
+            <ion-label >
+              OneTime
+            </ion-label>
+            <ion-toggle end color="dark" (ionChange)="selectChoreType(item)" formControlName="choreType"></ion-toggle>
+            <ion-label text-right>
+              Rotation
+            </ion-label>
+            <!--<ion-input [(ngModel)]="chore.type" color="secondary" type="text" formControlName="choreType"></ion-input>-->
+          </ion-item>
+          <p ion-text class="text08" *ngIf="onAddChoreForm.get('fullName').touched && onAddChoreForm.get('fullName').hasError('required')
+           && onAddChoreForm.get('chorePoint').touched && onAddChoreForm.get('chorePoint').hasError('required')">
+            <ion-text color="warning">
+              This field is required
+            </ion-text>
+          </p>
+    
+          <ion-list>
+            <ion-item *ngFor="let item of memberNames" button>
+              <ion-label>
+                {{item.memberName}}
+              </ion-label>
+              <ion-label text-right>
+                {{item.memberPoints}}
+              </ion-label>
+            <ion-checkbox (ionChange)="selectCheckBoxType(item)" formControlName="choreMembers"  slot="start">
+              
+            </ion-checkbox>
+          </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    
+
     </form>
 
 	<ion-button margin shape="round" expand="full" color="secondary" (click)="addChore()" [disabled]="!onAddChoreForm.valid">Add Chore</ion-button>

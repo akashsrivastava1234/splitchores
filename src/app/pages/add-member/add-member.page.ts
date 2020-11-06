@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {HttpClientModule} from '@angular/common/http';
 import { Platform, NavController, ToastController, MenuController, AlertController, LoadingController } from '@ionic/angular';
 import { EditGroupData, Member } from 'src/app/editGroupData';
+import { Globals } from 'src/app/Globals';
 
 @Component({
   selector: 'app-add-member',
@@ -41,23 +42,23 @@ export class AddMemberPage implements OnInit {
       duration: 2000
     });
     loader.present();
-    //const headers = new HttpHeaders()
-    //.set("Content-Type", "application/json");
+
     var headers = new HttpHeaders();
     headers.append('Access-Control-Allow-Origin' , '*');
     headers.append('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, PATCH');
     headers.append('responseType','text');
 
+
+    var obj = {
+      "familyId" : EditGroupData.GroupName.familyId,
+      "members" : [{"memberId" : this.member.memberId, "memberName" : "xyz", "memberPoints" : 0}]};
+    console.log(obj);
     this.http.patch(this.addMemberURL,
-    {
-        "familyId" : EditGroupData.GroupName.familyId,
-        "members" : [{"memberId" : this.member.memberId, "memberPoints" : "0"}]
-    }, {headers})
+    obj, {headers})
     .subscribe(
-        (val) => {
+       async (val) => {
             console.log("Add Member POST call successful value returned in body", 
                         val);
-            EditGroupData.memberNames.push(this.member);
             loader.dismiss();
             this.toastBox("Member Added Successfully");
             this.closeModal();
@@ -75,12 +76,12 @@ export class AddMemberPage implements OnInit {
             this.emptyFields(this.member);
         });
         //EditGroupData.memberNames.push(this.member.name)
-        this.nav.navigateForward('/edit-group'); 
+
   }
 
 
   closeModal() {
-    this.nav.navigateForward('/edit-group'); 
+    this.nav.navigateForward('/home-results'); 
   }
 
   emptyFields( memberDetails: Member) {
@@ -92,10 +93,37 @@ export class AddMemberPage implements OnInit {
     const toast = await this.toastCtrl.create({
       showCloseButton: true,
       message: errorMessage,
-      duration: 5000,
+      duration: 2000,
       position: 'bottom'
     });
 
     toast.present();
   }
+
+
+
+
+  getMemberByFamily(id) {
+    var memberByFamilyURL  = "http://splitchores.azurewebsites.net/MemberFamilies/";
+    console.log("getMemberByFamily");
+    this.http.get(memberByFamilyURL + EditGroupData.GroupName.familyId, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("Get Member By Family GET call successful value returned in body", 
+                          val);
+                for (var v in val) {
+                  if (id == v["memberId"])
+                    EditGroupData.memberNames.push(new Member(v["memberId"], v["memberName"], v["points"]));
+                }    
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
+
+  }
+
 }

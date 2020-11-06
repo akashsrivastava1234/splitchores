@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { MemberFamily } from './Globals';
 
 export class Member {
-  memberId; memberName; points;
-  constructor(memberId, memberName, points) {
+  memberId; memberName; memberPoints;
+  constructor(memberId, memberName, memberPoints) {
     this.memberId = memberId;
     this.memberName = memberName;
-    this.points = points;
+    this.memberPoints = memberPoints;
   }
 
   fromJSON(json) {
@@ -16,7 +16,7 @@ export class Member {
 }
 
 clone(){
-  return new Member(this.memberId, this.memberName, this.points)
+  return new Member(this.memberId, this.memberName, this.memberPoints)
 }
 }
 

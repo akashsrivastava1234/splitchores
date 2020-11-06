@@ -16,6 +16,7 @@ export class LoginPage implements OnInit {
   public onLoginForm: FormGroup;
 
   user = new User("", "");
+  semaphore = 0;
   public onRegisterForm: FormGroup;
   signinURL = "http://splitchores.azurewebsites.net/login"
   constructor(
@@ -96,10 +97,6 @@ export class LoginPage implements OnInit {
   }
 
   async goToHome() {
-    const loader = await this.loadingCtrl.create({
-      duration: 10000
-    });
-    loader.present();
     
     this.http.post(this.signinURL,
       {
@@ -110,31 +107,21 @@ export class LoginPage implements OnInit {
           async (val) => {
               console.log("POST call successful value returned in body", 
                           val);
-                          
-              
-              
               Globals.UserName = val["memberName"];
               Globals.userId= val["id"];
 
               this.getFamiliesByMemberId();
               this.getTasksByMemberId();
-    
-              await Globals.delay(3000)
-              loader.dismiss();
-              this.toastBox("SignIn Successful");
-              this.navCtrl.navigateRoot('/home-results');  
-  
+      
           },
           response => {
               //console.log("POST call in error", response);
               // user already exists
-              loader.duration = 1;
-              loader.dismiss();
               this.toastBox("Email/Password Mismatch");
           },
           () => {
               //console.log("The POST observable is now completed.");
-              this.emptyFields(this.user);
+              //this.emptyFields(this.user);
           });
   
     }
@@ -145,7 +132,7 @@ export class LoginPage implements OnInit {
       const toast = await this.toastCtrl.create({
         showCloseButton: true,
         message: errorMessage,
-        duration: 5000,
+        duration: 2000,
         position: 'bottom'
       });
   
@@ -170,6 +157,11 @@ export class LoginPage implements OnInit {
   
 //Tested
   async getFamiliesByMemberId() {
+    const loader = await this.loadingCtrl.create({
+      duration: 2000
+    });
+    loader.present();
+
     var getFamiliesURL  = "http://splitchores.azurewebsites.net/MemberFamilies/" + Globals.userId;
         console.log("getFamiliesByMemberId " + getFamiliesURL);
         this.http.get(getFamiliesURL, {
@@ -181,6 +173,13 @@ export class LoginPage implements OnInit {
                               Globals.groupsName = [];
                     for (var v in val) {
                       Globals.groupsName.push(new MemberFamily(val[v].familyId, val[v].familyName, val[v].memberPoints));
+                    }
+
+                    this.semaphore++;
+                    if(this.semaphore == 2) {
+                      loader.dismiss();
+                      this.toastBox("SignIn Successful");
+                      this.navCtrl.navigateRoot('/home-results');          
                     }
                     
               },
@@ -195,8 +194,13 @@ export class LoginPage implements OnInit {
 
   chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
   async getTasksByMemberId() {
-    var getTasks = "http://splitchores.azurewebsites.net/tasks/" + Globals.userId;
-    console.log("getTasksByMemberId");
+    const loader = await this.loadingCtrl.create({
+      duration: 2000
+    });
+    loader.present();
+
+    var getTasks = "http://splitchores.azurewebsites.net/MemberTask/" + Globals.userId;
+    console.log("getTasksByMemberId : " + getTasks);
     this.http.get(getTasks, {
   })
       .subscribe(
@@ -206,7 +210,13 @@ export class LoginPage implements OnInit {
                           Chores.chores = [];
                 for (var v in val) {
                   this.chore.fromJSON(val[v]);
-                  Chores.chores.push(this.chore);
+                  Chores.chores.push(this.chore.clone());
+                }
+                this.semaphore++;
+                if(this.semaphore == 2) {
+                  loader.dismiss();
+                  this.toastBox("SignIn Successful");
+                  this.navCtrl.navigateRoot('/home-results');          
                 }
                 
           },
@@ -216,8 +226,7 @@ export class LoginPage implements OnInit {
           () => {
 //                  console.log("The POST observable is now completed.");
           });
-}
-
+  }
 
 }
 

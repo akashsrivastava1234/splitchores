@@ -5,13 +5,15 @@ import {
   MenuController,
   ToastController,
   PopoverController,
-  ModalController } from '@ionic/angular';
+  ModalController,
+  LoadingController } from '@ionic/angular';
   import { NavigationExtras } from '@angular/router';
 // Call notifications test by Popover and Custom Component.
 import { NotificationsComponent } from './../../components/notifications/notifications.component';
 import { Globals, MemberFamily } from 'src/app/Globals';
 import { Chores, Chore} from 'src/app/Chores';
 import { EditGroupData, Member } from 'src/app/editGroupData';
+import { HttpHeaders } from '@angular/common/http';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LatLng } from '@ionic-native/google-maps';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
@@ -38,6 +40,7 @@ export class HomeResultsPage {
     public alertCtrl: AlertController,
     public modalCtrl: ModalController,
     public toastCtrl: ToastController,
+    public loadingCtrl: LoadingController,
     private geolocation: Geolocation,
     private backgroundMode: BackgroundMode,
     private http:HttpClient,
@@ -45,7 +48,7 @@ export class HomeResultsPage {
   ) {
     //this.getFamiliesByMemberId();
     //this.getTasksByMemberId();
-    console.log(this.groupsName);
+    console.log("homeresults called");
   }
 
   groupsName = Globals.groupsName;
@@ -53,16 +56,18 @@ export class HomeResultsPage {
   ionViewWillEnter() {
     this.backgroundMode.enable();
     this.menuCtrl.enable(true);
+    this.getTasksByMemberId();
+    console.log("homeresults called ionView");
   }
 
-  getFamiliesURL : string = "http://splitchores.azurewebsites.net/MemberFamilies/" + Globals.userId;
-  getTasks : string = "http://splitchores.azurewebsites.net/tasks/" + Globals.userId;
+  getFamiliesURL : string = "https://splitchores.azurewebsites.net/MemberFamilies/" + Globals.userId;
+  getTasks : string = "https://splitchores.azurewebsites.net/tasks/" + Globals.userId;
 
 
 
   member = new Member("","","")
   getMemberByFamily() {
-    var memberByFamilyURL = "http://splitchores.azurewebsites.net/FamilyMembers/";
+    var memberByFamilyURL = "https://splitchores.azurewebsites.net/FamilyMembers/";
     console.log("getMemberByFamily" + memberByFamilyURL + EditGroupData.GroupName.familyId);
     this.http.get(memberByFamilyURL + EditGroupData.GroupName.familyId, {
   })
@@ -88,7 +93,7 @@ export class HomeResultsPage {
 
   chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
   getTasksByFamily() {
-    var tasksByFamilyURL = "http://splitchores.azurewebsites.net/FamilyTask/" + EditGroupData.GroupName.familyId;
+    var tasksByFamilyURL = "https://splitchores.azurewebsites.net/FamilyTask/" + EditGroupData.GroupName.familyId;
     console.log("getTasksByFamily"+ EditGroupData.GroupName.familyId);
     this.http.get(tasksByFamilyURL, {
   })
@@ -99,7 +104,7 @@ export class HomeResultsPage {
                           Chores.chores = [];
                 for (var v in val) {
                   this.chore.fromJSON(val[v]);
-                  Chores.chores.push(this.chore);
+                  Chores.chores.push(this.chore.clone());
                 }    
           },
           response => {
@@ -109,6 +114,35 @@ export class HomeResultsPage {
 //                  console.log("The POST observable is now completed.");
           });
   }
+
+
+  
+  async getTasksByMemberId() {
+    var getTasks = "http://splitchores.azurewebsites.net/MemberTask/" + Globals.userId;
+    console.log("getTasksByMemberId : " + getTasks);
+    this.http.get(getTasks, {
+  })
+      .subscribe(
+          (val) => {
+              console.log("Get Tasks by member GET call successful value returned in body", 
+                          val);
+                          Chores.chores = [];
+                for (var v in val) {
+                  this.chore.fromJSON(val[v]);
+                  Chores.chores.push(this.chore.clone());
+                }
+
+                this.choresName = Chores.chores;
+                
+          },
+          response => {
+              console.log("No New Notification");
+          },
+          () => {
+//                  console.log("The POST observable is now completed.");
+          });
+  }
+
 
   async delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
@@ -152,11 +186,56 @@ export class HomeResultsPage {
     };*/
     console.log(name);
     EditGroupData.GroupName = name;
+    const loader = await this.loadingCtrl.create({
+      duration: 10000
+    });
+    loader.present();
     this.getMemberByFamily();
     this.getTasksByFamily();
-    await Globals.delay(2500);
+    await Globals.delay(3500);
+    loader.dismiss();
 
     this.navCtrl.navigateForward('/edit-group');
   }
 
+
+  async completeTask(name: any) {
+    console.log("Complete task called " + name);
+    console.log("completed Bool value : " + this.chore.completedBool);
+    var headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    var completeTaskURL = "https://splitchores.azurewebsites.net/completeTask/" + name.id
+    this.http.get(completeTaskURL, {headers
+    })
+        .subscribe(
+            (val) => {
+                console.log("Complete task url", 
+                            val);
+                            
+                  for (var i = 0; i < Chores.chores.length; i++) {
+                    if(Chores.chores[i].id == name.id) {
+                      Chores.chores[i].status = "Completed"
+                    }
+                  }
+                  this.toastBox("Task Completed!");
+            },
+            response => {
+                console.log("No New Notification");
+            },
+            () => {
+  //                  console.log("The POST observable is now completed.");
+            });
+    }
+  
+  async toastBox(errorMessage: string) {
+      const toast = await this.toastCtrl.create({
+        showCloseButton: true,
+        message: errorMessage,
+        duration: 2000,
+        position: 'bottom'
+      });
+  
+      toast.present();
+    }
+   
 }

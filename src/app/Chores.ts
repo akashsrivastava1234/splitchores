@@ -13,6 +13,7 @@ export class Chore {
   status;
   completedAt;
   choresRotationSchedule;
+  completedBool
   constructor(
   name,
   points,
@@ -40,7 +41,7 @@ export class Chore {
     this.status = status;
     this.completedAt = completedAt;
     this.choresRotationSchedule = choresRotationSchedule;
-    
+    this.completedBool = status == "Completed" ? true : false;
   }
 
   
@@ -51,8 +52,32 @@ export class Chore {
 }
 
 clone() {
-  return this.clone();
+  return new Chore(
+    this.name,
+    this.points,
+    this.ownerId,
+    this.startDate,
+    this.expiryDate,
+    this.familyId,
+    this.total,
+    this.type,
+    this.status,
+    this.completedAt,
+    this.choresRotationSchedule,
+    this.id)
 }
+}
+
+export class ChoreRotationSchedule {
+  memberId;order;
+  constructor(memberId,order) {
+    this.memberId = memberId;
+    this.order = order;
+  }
+
+  clone(){
+    return new ChoreRotationSchedule(this.memberId, this.order);
+  }
 }
 
 Injectable()
@@ -61,10 +86,5 @@ export class Chores{
     static chores = [
         //new Chore("Cooking", 500, "member1", "", "", "", "family1", "1"),
         //new Chore("Cleaning Utensils", 400, "member1", "", "", "", "family1", "1"),
-      ];
-
-    static ChoreName = '';
-    static ChorePoint = '';
-    static ChoreMember = '';
-    
+      ];    
 }

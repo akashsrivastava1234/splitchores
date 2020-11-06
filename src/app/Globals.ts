@@ -10,6 +10,9 @@ export class MemberFamily {
     this.familyName = familyName;
     this.memberPoints = memberPoints;
   }
+  clone() {
+    return new MemberFamily(this.familyId, this.familyName, this.memberPoints);
+  }
 }
 
 

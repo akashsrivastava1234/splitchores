@@ -27,26 +27,32 @@ export class EditGroupPage implements OnInit {
     public toastCtrl: ToastController,
     private formBuilder: FormBuilder,
     private http:HttpClient,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute) {
+      this.memberNames = EditGroupData.memberNames;
+      console.log("Constructor called edit group page")
+     }
 
   groupName = null;
   memberNames = null;
   chores = null;
+  user = Globals.userId;
   ngOnInit() {
-    this.getMemberByFamily();
-    this.getTasksByFamily();
+    //this.getMemberByFamily();
+    //this.getTasksByFamily();
     this.groupName = EditGroupData.GroupName;
     this.memberNames = EditGroupData.memberNames;
-    
     this.chores = Chores.chores
+    this.user = Globals.userId;
+    console.log(this.user + " -> user");
     console.log(this.memberNames);
   }
 
 
-  memberByFamilyURL : string = "http://splitchores.azurewebsites.net/MemberFamilies/";
+  member = new Member("","","")
+  memberByFamilyURL : string = "http://splitchores.azurewebsites.net/FamilyMembers/";
   tasksByFamilyURL : string = "http://splitchores.azurewebsites.net/FamilyTasks/" + EditGroupData.GroupName.familyId + "/";
   getMemberByFamily() {
-    console.log("getMemberByFamily");
+    console.log("getMemberByFamily : " + this.memberByFamilyURL);
     this.http.get(this.memberByFamilyURL + EditGroupData.GroupName.familyId, {
   })
       .subscribe(
@@ -55,8 +61,10 @@ export class EditGroupPage implements OnInit {
                           val);
                           EditGroupData.memberNames = [];
                 for (var v in val) {
-                  EditGroupData.memberNames.push(new Member(v["memberId"], v["memberName"], v["points"]));
+                  this.member.fromJSON(val[v]);
+                  EditGroupData.memberNames.push(this.member.clone());
                 }    
+                this.memberNames = EditGroupData.memberNames;
           },
           response => {
               console.log("No New Notification");
@@ -67,18 +75,22 @@ export class EditGroupPage implements OnInit {
 
   }
 
-  getTasksByFamily() {
-    console.log("getTasksByFamily");
-    this.http.get(this.tasksByFamilyURL, {
+  chore = new Chore("", "", "oneTime", null, null, "", "1", "", "On Going", null, null);  
+   getTasksByFamily() {
+    var tasksByFamilyURL = "https://splitchores.azurewebsites.net/FamilyTask/" + EditGroupData.GroupName.familyId;
+    console.log("getTasksByFamily"+ EditGroupData.GroupName.familyId);
+    this.http.get(tasksByFamilyURL, {
   })
       .subscribe(
           (val) => {
-              console.log("Get Tasks By family GET call successful value returned in body", 
+              console.log("Get Tasks by familyGET call successful value returned in body", 
                           val);
                           Chores.chores = [];
                 for (var v in val) {
-                  Chores.chores.push(<Chore>JSON.parse(v));
+                  this.chore.fromJSON(val[v]);
+                  Chores.chores.push(this.chore.clone());
                 }    
+                this.chores = Chores.chores;
           },
           response => {
               console.log("No New Notification");
@@ -101,7 +113,7 @@ export class EditGroupPage implements OnInit {
     const toast = await this.toastCtrl.create({
       showCloseButton: true,
       message: errorMessage,
-      duration: 5000,
+      duration: 2000,
       position: 'bottom'
     });
 
@@ -135,6 +147,40 @@ export class EditGroupPage implements OnInit {
     //});
     //return await modal.present();
   }
+
+
+  async completeTask(name: any) {
+    console.log("Complete task called " + name);
+    console.log("completed Bool value : " + this.chore.completedBool);
+    var headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    var completeTaskURL = "http://splitchores.azurewebsites.net/completeTask/" + name.id
+    this.http.get(completeTaskURL, {headers
+    })
+        .subscribe(
+            async (val) => {
+                console.log("Complete task url", 
+                            val);
+                            
+                  for (var i = 0; i < Chores.chores.length; i++) {
+                    if(Chores.chores[i].id == name.id) {
+                      Chores.chores[i].status = "Completed"
+                    }
+                  }
+                  await this.getMemberByFamily();
+                  await this.getTasksByFamily();
+                  this.toastBox("Task Completed!");
+            },
+            response => {
+                console.log("No New Notification");
+            },
+            () => {
+  //                  console.log("The POST observable is now completed.");
+            });
+    }
+  
+
+
 }
 
 export class Group {
